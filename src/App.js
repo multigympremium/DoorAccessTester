@@ -30,16 +30,16 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const data = {
       deviceLogId: parseInt(deviceLogId),
       cardNumber,
       deviceLogType: parseInt(deviceLogType),
     };
-
+  
     try {
       const res = await axios.post(`http://localhost:5000/api/device-logs/branch/${branchName}/access`, data);
-
+  
       if (res.status === 200) {
         if (data.deviceLogType === 3) {
           Swal.fire({
@@ -54,6 +54,13 @@ function App() {
             text: res.data.message,
           });
         }
+  
+        // Clear specific fields after successful submission
+        setCardNumber('');
+        setDeviceLogType('');
+        setBranchName('');
+        const generatedId = generateDeviceLogId();
+        setDeviceLogId(generatedId); // Generate a new ID for the next submission
       }
     } catch (error) {
       if (error.response) {
