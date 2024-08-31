@@ -38,7 +38,7 @@ function App() {
     };
   
     try {
-      const res = await axios.post(`http://localhost:5000/api/device-logs/branch/${branchName}/access`, data);
+      const res = await axios.post(`https://multigympremium.vercel.app/api/device-logs/branch/${branchName}/access`, data);
   
       if (res.status === 200) {
         if (data.deviceLogType === 3) {
