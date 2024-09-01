@@ -9,6 +9,8 @@ import {
   MenuItem,
   Typography,
   Box,
+  FormControlLabel,
+  Checkbox
 } from '@mui/material';
 
 function App() {
@@ -16,6 +18,8 @@ function App() {
   const [cardNumber, setCardNumber] = useState('');
   const [branchName, setBranchName] = useState('');
   const [deviceLogType, setDeviceLogType] = useState('');
+  const [logDateTime, setLogDateTime] = useState('');
+  const [isChecked, setIsChecked] = useState(false); // New state for checkbox
 
   // Function to generate a 6-digit random number
   const generateDeviceLogId = () => {
@@ -30,16 +34,20 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const data = {
       deviceLogId: parseInt(deviceLogId),
       cardNumber,
       deviceLogType: parseInt(deviceLogType),
     };
-  
+
+    if (isChecked) {
+      data.logDateTime = logDateTime; // Only include logDateTime if checkbox is checked
+    }
+
     try {
       const res = await axios.post(`https://multigympremium.vercel.app/api/device-logs/branch/${branchName}/access`, data);
-  
+
       if (res.status === 200) {
         if (data.deviceLogType === 3) {
           Swal.fire({
@@ -54,11 +62,7 @@ function App() {
             text: res.data.message,
           });
         }
-  
-        // Clear specific fields after successful submission
-        setCardNumber('');
-        setDeviceLogType('');
-        setBranchName('');
+
         const generatedId = generateDeviceLogId();
         setDeviceLogId(generatedId); // Generate a new ID for the next submission
       }
@@ -155,6 +159,33 @@ function App() {
             <MenuItem value={2}>PUNCH OUT</MenuItem>
             <MenuItem value={3}>PUSH UP</MenuItem>
           </TextField>
+          
+          {/* Checkbox to decide if logDateTime should be included */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
+                color="primary"
+              />
+            }
+            label="Include Date & Time"
+          />
+          
+          {/* Conditionally render the logDateTime field */}
+          {isChecked && (
+            <TextField
+              label="Log Date & Time"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              type="datetime-local"
+              value={logDateTime}
+              onChange={(e) => setLogDateTime(e.target.value)}
+              required={isChecked} // Required only if checkbox is checked
+            />
+          )}
+
           <Box display="flex" justifyContent="center" mt={3}>
             <Button
               type="submit"
